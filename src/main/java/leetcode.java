@@ -1,3 +1,5 @@
+import sun.nio.cs.ext.MacHebrew;
+
 import java.util.*;
 
 /**
@@ -184,6 +186,105 @@ public class leetcode {
             return false;
     }
 
+
+    /**
+     * 单调栈：LeetCode84、85、739、503
+     *https://leetcode.cn/problems/largest-rectangle-in-histogram/
+     * 84  柱状图中最大的矩形
+     */
+    public int largestRectangleArea(int[] heights) {
+        //暴力解法
+        //不行，过不了，超时
+        int res=0;
+        for (int i = 0; i < heights.length; i++) {
+            int height = heights[i];
+            int left = i,right = i;
+            while ( left >= 1&&height <= heights[left-1] ) {
+                left--;
+            }
+            while (right+1 < heights.length&&height <= heights[right+1]) {
+                right++;
+            }
+            int r = 0;
+
+            r = (right - left+1) * height;
+
+            res = res > r ? res : r;
+        }
+        return res;
+
+    }
+
+    //单调栈解法
+    public int largestRectangleArea_1(int[] heights) {
+        int n=heights.length;
+        if(n==0) return 0;
+        if(n==1) return heights[0];
+        //单调栈，存放升序的下标
+        Stack<Integer> stack=new Stack<>();
+        int res=0;
+        stack.push(0);
+        for (int i = 1; i < heights.length; i++) {
+            //如果当前元素比栈顶元素小
+            while(!stack.isEmpty()&&heights[stack.peek()]>heights[i]){
+                int index=stack.pop();
+                int stack_height=heights[index];
+                int w;
+                if(stack.isEmpty()){
+                    w=i;
+                }else{
+                    w=i-stack.peek()-1;
+                }
+                res= Math.max(res,w*stack_height);
+            }
+            stack.push(i);
+
+        }
+        while(!stack.isEmpty()){
+            int index=stack.pop();
+            int stack_height=heights[index];
+            int w;
+            if(stack.isEmpty()){
+                w=n;
+            }else{
+                w=n-stack.peek()-1;
+            }
+            res= Math.max(res,w*stack_height);
+        }
+        return res;
+    }
+
+    /**
+     * 单调栈：LeetCode84、85、739、503
+     * https://leetcode.cn/problems/maximal-rectangle/
+     * 85. 最大矩形
+     * 大佬的思路，把每一层看成是柱状图，然后求最大值，这样就成了第84题。
+     * @param matrix
+     * @return
+     */
+    public int maximalRectangle(char[][] matrix) {
+        if (matrix.length == 0 || matrix[0].length == 0) {
+            return 0;
+        }
+        int col = matrix.length;
+        int row = matrix[0].length;
+        int[] heights = new int[row];
+        int ans = 0;
+        for (int i = 0; i < col; i++) {
+            for (int j = 0; j < row; j++) {
+                if (matrix[i][j] == '1') {
+                    heights[j] += 1;
+                } else {
+                    heights[j] = 0;
+                }
+            }
+            ans = Math.max(ans, largestRectangleArea_1(heights));
+        }
+        return ans;
+
+    }
+
+
     /**
      * 单调栈：LeetCode84、85、739、503
      *https://leetcode.cn/problems/daily-temperatures/
@@ -339,6 +440,7 @@ public class leetcode {
     /**
      * 滑动窗口：LeetCode209、3、1004、1208
      * 209
+     * https://leetcode.cn/problems/minimum-size-subarray-sum/
      * 长度最小的子数组
      * @param args
      */
@@ -511,6 +613,44 @@ public class leetcode {
      * 560
      * 和为 K 的子数组
      * https://leetcode.cn/problems/subarray-sum-equals-k/
+     * @param root
+     * @param  targetSum
+     */
+    public int pathSum(TreeNode root, int targetSum) {
+        if(root==null){
+            return 0;
+        }
+        int res=huisu_path(root,targetSum,0);
+        res+=pathSum(root.left,targetSum);
+        res+=pathSum(root.right,targetSum);
+        return res;
+    }
+
+    private int huisu_path(TreeNode root, int targetSum,long  now_sum) {
+        int res=0;
+        if(root==null){
+            return 0;
+        }
+        if(now_sum+root.val==targetSum){
+            res++;
+        }
+        now_sum+= root.val;
+        if(root.left!=null){
+            res+=huisu_path(root.left, targetSum, now_sum);
+        }
+        if(root.right!=null){
+            res+=huisu_path(root.right, targetSum, now_sum);
+        }
+        now_sum-= root.val;
+        return res;
+
+    }
+
+    /**
+     * 前缀和：LeetCode724、560、437、1248
+     * 560
+     * 和为 K 的子数组
+     * https://leetcode.cn/problems/subarray-sum-equals-k/
      * @param args
      */
     public static int subarraySum(int[] nums, int k) {
@@ -672,6 +812,79 @@ public class leetcode {
     /**
      *
      *  字符串：LeetCode5、20、43、93
+     * 5. 最长回文子串
+     * https://leetcode.cn/problems/longest-palindromic-substring/
+     * @param s
+     * @return
+     */
+    public String longestPalindrome(String s) {
+        //思路，暴力解法
+        String res=new String();
+        int max=0;
+        for (int i = 0; i < s.length()-1; i++) {
+            for (int j = i+1; j <= s.length(); j++) {
+                if(huiwen(s.substring(i,j))){
+                  if(max<j-i){
+                      res=s.substring(i,j);
+                      max=j-i;
+                  }
+                }
+            }
+        }
+        return res;
+    }
+
+    private boolean huiwen(String substring) {
+        if(substring.length()==1) return true;
+        int i=0,j=substring.length()-1;
+        while(i<j){
+            if(substring.charAt(i)==substring.charAt(j)){
+                i++;
+                j--;
+            }
+            else{
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public String longestPalindrome_1(String s) {
+        //暴力解法会超时，用动态规划，对于一个字符串s[i,j]`如果他是字符串，那么对于s[i-1,j+1]，只要s[i-1]==s[j+1]那么他就是回文串
+        int len=s.length();
+        int max=0;
+        String res=new String();
+        if(len==1) return s;
+        boolean[][] dp=new boolean[len][len];
+        for (int i = 0; i < len; i++) {
+            dp[i][i]=true;
+        }
+        //右边界
+        for (int i = 1; i < len; i++) {
+            //左边界
+            for (int j = 0; j <= i; j++) {
+                if(s.charAt(j)!=s.charAt(i)){
+                    dp[j][i]=false;
+                }else{
+                    if(i-j<3){
+                        dp[j][i]=true;
+                    }else{
+                        dp[j][i]=dp[j+1][i-1];
+                    }
+                }
+                if(dp[j][i]&&max<(i-j+1)){
+                    max=i-j+1;
+                    res=s.substring(j,i+1);
+                }
+            }
+        }
+        return res;
+    }
+
+
+    /**
+     *
+     *  字符串：LeetCode5、20、43、93
      * 20
      * 有效的括号
      * https://leetcode.cn/problems/valid-parentheses/comments/
@@ -774,6 +987,87 @@ public class leetcode {
     }
 
     /**
+     * 字符串：LeetCode5、20、43、93
+     * 93  复原 IP 地址
+     * https://leetcode.cn/problems/restore-ip-addresses/
+     * @param s
+     * @return
+     */
+    public  List<String> restoreIpAddresses(String s) {
+        List<String> res=new ArrayList<>();
+        String tmp =new String();
+        if(s.length()>12) return res;
+        int num_duan=0;
+        int index=0;
+        huisu_ip(res,tmp,num_duan,index,s);
+        TreeSet<String> set=new TreeSet<>();
+        List<String> stringLi=new ArrayList<>();
+        for (int i = 0; i < res.size(); i++) {
+            if(set.contains(res.get(i))){
+                continue;
+            }else{
+                set.add(res.get(i));
+                stringLi.add(res.get(i));
+            }
+        }
+        return stringLi;
+
+    }
+
+    private static void huisu_ip(List<String> res, String tmp, int numDuan, int index,String s) {
+        if(numDuan==4){
+            res.add(new String(tmp));
+            tmp=new String();
+            return ;
+        }
+        for (int i = index; i <s.length() ; i++) {
+            String sub=s.substring(index,i+1);
+            if(numDuan==3){
+                sub=s.substring(index,s.length());
+            }
+            if(ip_isLegal(sub)){
+                int l=0;
+                if(tmp.length()!=0){
+                    tmp+=".";
+                    l=sub.length()+1;
+                }else{
+                    l=sub.length();
+                }
+
+                tmp+=sub;
+                huisu_ip(res, tmp, numDuan+1, i+1, s);
+                tmp=tmp.substring(0,tmp.length()-l);
+
+            }else{
+                break;
+            }
+        }
+    }
+
+    private static boolean ip_isLegal(String s) {
+        int sum=0;
+        if(s.length()>1&&s.charAt(0)=='0'){
+            return false;
+        }
+        for (int i = 0; i <s.length(); i++) {
+            sum*=10;
+            sum+=(int)(s.charAt(i)-'0');
+        }
+        if(sum<=255){
+            return true;
+        }
+        return false;
+    }
+
+//    public static void main(String[] args) {
+//        leetcode l=new leetcode();
+//        List<String > res=l.restoreIpAddresses("25525511135");
+//        for (int i = 0; i < res.size(); i++) {
+//            System.out.println(res.get(i));
+//        }
+//    }
+
+    /**
      * https://leetcode.cn/problems/search-in-rotated-sorted-array/
      *二分查找：LeetCode33、34
      * 33
@@ -871,6 +1165,51 @@ public class leetcode {
      * @param args
      */
 
+    /**
+     *
+     * DFS&回溯：：LeetCode934、685、1102、531、533、113、332、337
+     * https://leetcode.cn/problems/path-sum-ii/
+     * 113. 路径总和 II
+     * @param root
+     * @param targetSum
+     * @return
+     */
+    public List<List<Integer>> pathSum_(TreeNode root, int targetSum) {
+        List<List<Integer>> res=new ArrayList<>();
+        List<Integer> tmp=new ArrayList<>();
+        int sum=0;
+        huisu_1(res,tmp,root,targetSum,sum);
+        return res;
+    }
+
+    private void huisu_1(List<List<Integer>> res, List<Integer> tmp, TreeNode root, int targetSum, int sum) {
+        if(root==null){
+            return;
+        }
+        if(sum+root.val==targetSum&&root.left==null&&root.right==null){
+            tmp.add(root.val);
+            res.add(new ArrayList<>(tmp));
+            tmp.remove(tmp.size()-1);
+
+            return ;
+        }
+        //有负数！！！
+        // if(sum+root.val>targetSum){
+        //     return;
+        // }
+        tmp.add(root.val);
+        sum+=root.val;
+        if(root.left!=null){
+            huisu_1(res, tmp, root.left, targetSum, sum);
+        }
+
+        if(root.right!=null){
+            huisu_1(res, tmp, root.right, targetSum, sum);
+        }
+        sum-=root.val;
+        tmp.remove(tmp.size()-1);
+
+    }
 
     /**
      * 62是他的简化版。不做了
@@ -897,9 +1236,13 @@ public class leetcode {
 
             }
         }
+
         return dp[m-1][n-1];
 
+
     }
+
+
 
     /**
      * 动态规划：LeetCode213、123、62、63、361、1230
@@ -1105,21 +1448,73 @@ public class leetcode {
         return Math.max(retlength,tasks.length);
 
     }
-    public static void main(String[] args) {
-//        dailyTemperatures(new int[]{35,56,56,53,43,88,40,82,55,43,35,43,41,75,91,83,60,94,44,50,42,51,63,88,45,70,42,77,47,51,70,69,89,41,50,81,46,54,99,54,44,76,44,34,37,83,35,96,58,75,99,70,32,81,75,77,81,91,60,51,54,62,99,54,62,88,45,87,96,62,63,98,37,54,100,69,58,95,37,53,56,91,35,97,80,72,37,43,35,75,90,79,35,42,68,44,82,74,77,92});
-//    int[] t=nextGreaterElements(new int[]{1,2,1});
-//        int res=longestOnes(new int[]{1,1,1,0,0,0,1,1,1,1,0},2);
-//        int res=subarraySum(new int[]{1,1,1},2);
-//        carPooling(new int[][]{{3,3,7},{2,1,5}},4);
-//        String r=multiply("123","456");
-//        int t=search(new int[]{4,5,6,7,0,1,2},0);
-//        canJump(new int[]{3,2,1,0,4});
-//        eraseOverlapIntervals(new int[][]{{-52,31},{-73,-26},{82,97},{-65,-11},{-62,-49},{95,99},{58,95},{-31,49},{66,98},{-63,2},{30,47},{-40,-26}});
-//          findMinArrowShots(new int[][]{{-2147483646,-2147483645},{2147483646,2147483647}});
-        maxProfit_3(new int[]{1,2,4,2,5,7,2,4,9,0});
-//        System.out.println(t);
+
+
+    /**
+     *
+     * https://leetcode.cn/problems/robot-bounded-in-circle/
+     * @param instructions
+     * @return
+     */
+    public boolean isRobotBounded(String instructions) {
+        int weizhi[]=new int[]{0,0};
+        if(instructions.length()==1&&instructions.charAt(0)=='G') return false;
+        char[] fangxiang=new char[]{'u','r','d','l'};
+        int now=0;
+        int t=10;
+        while(t>0){
+            for (int i = 0; i < instructions.length(); i++) {
+                char c=instructions.charAt(i);
+                if(c=='R'){
+                    now=(now+1)%4;
+                }else if(c=='L'){
+                    if(now==0)now=3;
+                    else{
+                        now=(now-1)%4;
+                    }
+
+                } else if (c=='G') {
+                    if(now==0){
+                        weizhi[1]++;
+                    } else if (now==1) {
+                        weizhi[0]++;
+                    } else if (now==2) {
+                        weizhi[1]--;
+                    }else {
+                        weizhi[0]--;
+                    }
+                }
+            }
+            if(weizhi[0]==0&weizhi[1]==0){
+                return true;
+            }
+            t--;
+        }
+
+        return false;
 
     }
+
+    public static void main(String[] args) {
+       leetcode l=new leetcode();
+       l.isRobotBounded("LLGRL");
+    }
+
+//    public static void main(String[] args) {
+////        dailyTemperatures(new int[]{35,56,56,53,43,88,40,82,55,43,35,43,41,75,91,83,60,94,44,50,42,51,63,88,45,70,42,77,47,51,70,69,89,41,50,81,46,54,99,54,44,76,44,34,37,83,35,96,58,75,99,70,32,81,75,77,81,91,60,51,54,62,99,54,62,88,45,87,96,62,63,98,37,54,100,69,58,95,37,53,56,91,35,97,80,72,37,43,35,75,90,79,35,42,68,44,82,74,77,92});
+////    int[] t=nextGreaterElements(new int[]{1,2,1});
+////        int res=longestOnes(new int[]{1,1,1,0,0,0,1,1,1,1,0},2);
+////        int res=subarraySum(new int[]{1,1,1},2);
+////        carPooling(new int[][]{{3,3,7},{2,1,5}},4);
+////        String r=multiply("123","456");
+////        int t=search(new int[]{4,5,6,7,0,1,2},0);
+////        canJump(new int[]{3,2,1,0,4});
+////        eraseOverlapIntervals(new int[][]{{-52,31},{-73,-26},{82,97},{-65,-11},{-62,-49},{95,99},{58,95},{-31,49},{66,98},{-63,2},{30,47},{-40,-26}});
+////          findMinArrowShots(new int[][]{{-2147483646,-2147483645},{2147483646,2147483647}});
+//        maxProfit_3(new int[]{1,2,4,2,5,7,2,4,9,0});
+////        System.out.println(t);
+//
+//    }
 
 }
 
