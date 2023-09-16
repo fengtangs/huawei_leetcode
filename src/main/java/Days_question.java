@@ -1,36 +1,39 @@
+import java.sql.SQLOutput;
 import java.util.*;
 
 public class Days_question {
     public static void main(String[] args) {
 
+//        Days_question sss=new Days_question();
+//        sss.countAndSay();
 
-        int n=2,m=2,k=2;
-        //第一个矩阵的列数以及第二个矩阵的行数
-        int Maze[][]=new int[][]{{2,1},{1,1}};
-        int Maze1[][]=new int[][]{{2,1},{1,1}};
-        int Maze2[][]=new int[][]{{2,1},{1,1}};
-
-        for(int i=0;i<n;i++)
-        {
-            for(int u=0;u<k;u++)
-            {
-                for(int j=0;j<m;j++)
-                {
-
-                    Maze2[i][u]+=Maze[i][j]*Maze1[j][u];
-                }
-            }
-        }
-
-        for(int i=0;i<n;i++)//将第三个矩阵输出出来
-        {
-            for(int j=0;j<k;j++)
-            {
-                System.out.print(Maze2[i][j]+" ");
-
-            }
-            System.out.println();
-        }
+//        int n=2,m=2,k=2;
+//        //第一个矩阵的列数以及第二个矩阵的行数
+//        int Maze[][]=new int[][]{{2,1},{1,1}};
+//        int Maze1[][]=new int[][]{{2,1},{1,1}};
+//        int Maze2[][]=new int[][]{{2,1},{1,1}};
+//
+//        for(int i=0;i<n;i++)
+//        {
+//            for(int u=0;u<k;u++)
+//            {
+//                for(int j=0;j<m;j++)
+//                {
+//
+//                    Maze2[i][u]+=Maze[i][j]*Maze1[j][u];
+//                }
+//            }
+//        }
+//
+//        for(int i=0;i<n;i++)//将第三个矩阵输出出来
+//        {
+//            for(int j=0;j<k;j++)
+//            {
+//                System.out.print(Maze2[i][j]+" ");
+//
+//            }
+//            System.out.println();
+//        }
 
 
 
@@ -49,6 +52,231 @@ public class Days_question {
     }
 }
 class  Solution1 {
+    public static  int thisis=0;
+    public static void main(String[] args) {
+        String a="abc";
+        String c="abc";
+
+        String b=new String("abc");
+        System.out.println(c==a);
+        System.out.println(a==b);
+//        ListNode head=new ListNode(1);
+//        ListNode q=new ListNode(4);
+//        ListNode w=new ListNode(3);
+//        ListNode e=new ListNode(2);
+//        ListNode r=new ListNode(5);
+//        ListNode t=new ListNode(2);
+//        head.next=q;
+//        q.next=w;
+//        w.next=e;
+//        e.next=r;
+//        r.next=t;
+//        Solution1.partition(head,3);
+
+        //Solution1.addStrings("11","123");
+    }
+    public static String addStrings(String num1, String num2) {
+        Stack<Character> stack=new Stack<>();
+        int i=num1.length()-1,j=num2.length()-1;
+        int jinwei=0;
+        while(i>=0&&j>=0){
+            int tmp=jinwei+num1.charAt(i--)+num2.charAt(j--)-2*'0';
+            if(tmp>9){
+                jinwei=1;
+                tmp-=10;
+            }else{
+                jinwei=0;
+            }
+            stack.push((Character.valueOf((char)tmp)));
+        }
+        while (i>=0){
+            int tmp=jinwei+num1.charAt(i--)-'0';
+            if(tmp>9){
+                jinwei=1;
+                tmp-=10;
+            }else{
+                jinwei=0;
+            }
+            stack.push((Character.valueOf((char)tmp)));
+        }
+        while (j>=0){
+            int tmp=jinwei+num2.charAt(j--)-'0';
+            if(tmp>9){
+                jinwei=1;
+                tmp-=10;
+            }else {
+                jinwei=0;
+            }
+            stack.push((Character.valueOf((char)tmp)));
+        }
+        char[] res=new char[stack.size()];
+        i=0;
+        while(!stack.isEmpty()) {
+            res[i++]= stack.pop();
+
+        }
+        return new String(res);
+    }
+    public long maxAlternatingSum(int[] nums) {
+        int n=nums.length;
+        int[] tmp = new int[nums.length + 2];
+        tmp[0]=0;
+        tmp[nums.length+1]=0;
+        boolean plus = true;
+        long res = 0;
+        System.arraycopy(nums, 0, tmp, 1, n);
+        for (int i = 1; i <=nums.length ; i++) {
+            if (plus) {
+                if (tmp[i-1] <= tmp[i] && tmp[i] > tmp[i+1]) {
+                    res += tmp[i];
+                    plus = !plus;
+                }
+            } else {
+                if (tmp[i-1] >= tmp[i] && tmp[i] < tmp[i+1]) {
+                    res -= tmp[i];
+                    plus = !plus;
+                }
+            }
+        }
+        return  res;
+
+    }
+    public int threeSumClosest(int[] nums, int target) {
+
+        int res=target;
+        int min=Integer.MAX_VALUE;
+        Arrays.sort(nums);
+        for (int i = 0; i < nums.length-2; i++) {
+            int l=i+1,r=nums.length-1;
+            while(l<r){
+                int sum=nums[i]+nums[l]+nums[r];
+                if(Math.abs(sum-target)<min){
+                    min=Math.abs(sum-target);
+                    res=sum;
+                }
+                if(sum>target){
+                    r--;
+                }
+                else if(sum<target) {
+                    l++;
+                }else{
+                    return target;
+                }
+            }
+        }
+
+        return res;
+    }
+
+    public static List<List<Integer>> threeSum(int[] nums) {
+
+        List<List<Integer>> res=new ArrayList<>();
+        Arrays.sort(nums);
+        HashSet<String> set=new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+             int target=-nums[i];
+             int  f=0;
+            for (int start = 0, end = nums.length-1; start<end;) {
+                int sum=nums[start]+nums[end];
+                if(sum==target){
+                    if(start!=i&&end!=i){
+                        int []tep=new int[]{-target,nums[start],nums[end]};
+                        Arrays.sort(tep);
+                        String S=String.valueOf(tep[0])+" "+String.valueOf(tep[1])+" "+String.valueOf(tep[2]);
+                        if(!set.contains(S)){
+                            set.add(S);
+                            res.add(Arrays.asList(tep[0],tep[1],tep[2]));
+                        }
+
+                    }
+                    f=0;
+                    start++;
+                    end--;
+                }
+                else if(sum>target){
+                    if(f==2){
+                        break;
+                    }
+                    end--;
+                    f=1;
+                }
+                else {
+                    if(f==1){
+                        break;
+                    }
+                    f=2;
+                    start++;
+                }
+            }
+        }
+
+        return res;
+
+    }
+
+    public static ListNode partition(ListNode head, int x) {
+
+        if(head==null||head.next==null)
+            return head;
+        ListNode small = new ListNode(0);
+        ListNode smallHead = small;
+        ListNode large = new ListNode(0);
+        ListNode largeHead = large;
+        while (head != null) {
+            if (head.val < x) {
+                small.next = head;
+                small = small.next;
+            } else {
+                large.next = head;
+                large = large.next;
+            }
+            head = head.next;
+        }
+        large.next = null;
+        small.next = largeHead.next;
+        return smallHead.next;
+    }
+
+        /**
+         * https://leetcode.cn/problems/count-and-say/
+         */
+        public static String countAndSay(int n) {
+            StringBuffer pre=new StringBuffer("1");
+            StringBuffer now=new StringBuffer();
+            if(n==1){
+                return pre.toString();
+            }
+            for (int i = 1; i <n ; i++) {
+                char c=pre.charAt(0);
+                int num=1;
+                for (int j = 1; j < pre.length(); j++) {
+                    if(c==pre.charAt(j)){
+                        num++;
+                    }
+                    else{
+                        now.append(num);
+                        now.append(c);
+                        c=pre.charAt(j);
+                        num=1;
+
+                    }
+                }
+                now.append(num);
+                now.append(c);
+                pre=now;
+                System.out.println(i+":"+pre.toString());
+                now=new StringBuffer();
+            }
+
+            return pre.toString();
+
+
+
+
+        }
+
+
+
 
     /**
      * https://leetcode.cn/problems/number-of-distinct-averages/

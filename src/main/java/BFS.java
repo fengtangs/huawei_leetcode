@@ -48,7 +48,7 @@ public class BFS {
                     if (x1 < 0 || x1 >= m || y1 < 0||y1>=n || grid[x1][y1]==1){
                         continue;
                     }
-                    //把在数组范围内 并且为0不阻塞的放入队列中
+                    //把在数范组围内 并且为0不阻塞的放入队列中
                     queue.add(new int[]{x1,y1});
                     grid[x1][y1] = 1; // 标记
                 }

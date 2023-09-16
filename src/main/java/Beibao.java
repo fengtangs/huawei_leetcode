@@ -11,7 +11,7 @@ public class Beibao {
         for (int i = weights[0]; i < n;  i++) {
                 dp[0][i]=weights[0];
         }
-
+        Object bj=new Object();
         for (int i = 1; i < n; i++) {
             for (int j = 0; j <=bag_weight; j++) {
                 if(j<weights[i])dp[i][j]=dp[i-1][j];
